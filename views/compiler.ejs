@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Compiler</title>
+  <script type="text/javascript">
+    var result = "";
+    window.onload = () => {
+      var output = document.getElementById("output");
+    }
+    handleSubmit = async event => {
+      event.preventDefault();
+      let body = {}
+      for (let i = 0; i < event.target.length - 1; i++) {
+        let value = event.target[i].value;
+        let key = event.target[i].id;
+        body[key] = value;
+      }
+      const result = await compileCode(body);
+      await (output.innerHTML = result.stderr ? `Error: ${result.stderr}` : `${result.stdout}`);
+    }
+    compileCode = async body => {
+      try {
+        const response = await fetch('http://localhost:1200/compiler/compile', {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+        return await response.json();
+      } catch (error) {
+        alert('Something went wrong' + error);
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <center>
+    <h1>Compiler Demo</h1>
+    <form id="myform" name="myform" method="POST" onsubmit="handleSubmit(event)">
+      <h3>Code</h3>
+      <textarea rows="13" cols="100" id="code" name="code"></textarea>
+      <br />
+      <h3>Input</h3>
+      <textarea rows="10" cols="100" id="input" name="input"></textarea>
+      <br />
+      Language : <select name="lang" id="lang">
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="java">Java</option>
+        <option value="python">Python</option>
+        <option value="node">JS (Node Env)</option>
+      </select>
+      <br />
+      <br />
+      <!-- Compile With Input :
+      <input type="radio" name="inputRadio" id="hasInput" value="true" />Yes
+      <input type="radio" name="inputRadio" id="hasInput" value="false" />No
+      <br /> -->
+      <input type="submit" value="submit" name="submit" />
+    </form>
+    <h3>Output</h3>
+    <textarea rows="6" cols="100" id="output" name="output" disabled>Hello</textarea>
+
+  </center>
+</body>
+
+</html>
